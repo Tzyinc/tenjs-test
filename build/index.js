@@ -200,7 +200,6 @@ class App extends tenjs.Component {
   * @param {object} props
   */
   constructor(props) {
-    console.log('test');
     super(props);
     this.state = {
       count: 1
@@ -213,12 +212,12 @@ class App extends tenjs.Component {
     return createElement(
       'div',
       null,
-      'hello world'
+      'helloworld'
     );
   }
 }
 
-tenjs.render(createElement(App, { name: 'test' }), document.getElementById('root'));
+tenjs.render(createElement(App, null), document.getElementById('root'));
 
 }());
 //# sourceMappingURL=index.js.map

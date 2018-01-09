@@ -6,7 +6,6 @@ class App extends tenjs.Component {
   * @param {object} props
   */
   constructor(props) {
-    console.log('test');
     super(props);
     this.state = {
       count: 1,
@@ -16,10 +15,8 @@ class App extends tenjs.Component {
   * @return {object}
   */
   render() {
-    return (
-      <div>hello world</div>
-    );
+    return (<div>helloworld</div>);
   }
 }
 
-tenjs.render(<App name = 'test'/>, document.getElementById('root'));
+tenjs.render(<App/>, document.getElementById('root'));
