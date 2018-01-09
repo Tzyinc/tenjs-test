@@ -1,22 +1,14 @@
+console.log('test');
 import tenjs, {createElement} from '../../Tenjs2/ten';
 /**
 */
 class App extends tenjs.Component {
   /**
-  * @param {object} props
-  */
-  constructor(props) {
-    super(props);
-    this.state = {
-      count: 1,
-    };
-  }
-  /**
   * @return {object}
   */
   render() {
-    return (<div>helloworld</div>);
+    return (<div>hello {this.props.name} </div>);
   }
 }
 
-tenjs.render(<App/>, document.getElementById('root'));
+tenjs.render(<App name='test'/>, document.getElementById('root'));
