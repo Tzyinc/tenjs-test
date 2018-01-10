@@ -1,14 +1,7 @@
-console.log('test');
-import tenjs, {createElement} from '../../Tenjs2/ten';
-/**
-*/
-class App extends tenjs.Component {
-  /**
-  * @return {object}
-  */
-  render() {
-    return (<div>hello {this.props.name} </div>);
-  }
-}
+import tenjs, {createElement} from '../../Tenjs/ten';
+import App from './app';
+// import 'todomvc-common';
+// import 'todomvc-common/base.css';
+// import 'todomvc-app-css/index.css';
 
 tenjs.render(<App name='test'/>, document.getElementById('root'));

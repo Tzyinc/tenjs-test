@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "http-server build -o -p 8080",
+    "test": "http-server assets -p 8000",
+    "start": "http-server build -p 8080",
     "prestart": "npm run build",
     "build": "npm run build:rollup",
     "build:webpack": "mkdirp build && ncp src/index.html build/index.html && webpack -p",
-    "build:rollup": "rimraf build && mkdirp build/driver-common && ncp src/index.html build/index.html && rollup -c rollup.config.js && cp src/index.css build/index.css"
+    "build:rollup": "rimraf build && mkdirp build/driver-common && ncp src/index.html build/index.html && rollup -c rollup.config.js && cp src/index.css build/index.css && ncp assets build/assets"
   },
   "author": "",
   "license": "ISC",
@@ -25,7 +25,6 @@
     "babel-preset-es2015-loose": "^8.0.0",
     "babel-preset-es2016": "^6.24.1",
     "babel-preset-stage-0": "^6.5.0",
-    "eslint": "^4.15.0",
     "eslint-plugin-react": "^7.5.1",
     "http-server": "^0.10.0",
     "ncp": "^2.0.0",
@@ -40,6 +39,14 @@
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-plugin-external-helpers": "^6.22.0"
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-nodejs-import-images": "^1.0.0",
+    "babel-plugin-webpack-loaders": "^0.9.0",
+    "eslint": "^4.15.0",
+    "eslint-config-google": "^0.9.1",
+    "file-loader": "^1.1.6",
+    "image-webpack-loader": "^3.4.2",
+    "rollup-plugin-image": "^1.0.2",
+    "url-loader": "^0.6.2"
   }
 }

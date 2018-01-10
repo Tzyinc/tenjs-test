@@ -208,23 +208,181 @@ var tenjs = {
   render
 };
 
-console.log('test');
+const paths = {
+  assets: 'http://localhost:8080/assets/'
+};
+
 /**
+* login main page
 */
-class App extends tenjs.Component {
+class Login extends tenjs.Component {
   /**
-  * @return {object}
+  * @param {object} props
+  */
+  constructor(props) {
+    super(props);
+    this.state = {
+      nowShowing: 'home',
+      loginName: '',
+      loginPassword: ''
+    };
+  }
+  /**
+  * @return {jsx}
   */
   render() {
     return createElement(
       'div',
       null,
-      'hello ',
-      this.props.name,
-      ' '
+      createElement(
+        'div',
+        { className: 'height-90 opacity-full' },
+        createElement(
+          'div',
+          { className: 'center-text login-subtext' },
+          'FIND THE MOST LOVED ACTIVITIES'
+        ),
+        createElement(
+          'div',
+          { className: 'center-text login-maintext' },
+          'BLACK CAT'
+        ),
+        createElement(
+          'div',
+          { className: 'center-block login-logo-circle' },
+          createElement('object', { type: 'image/svg+xml',
+            data: paths.assets + 'logo-cat.svg',
+            className: 'center-block login-logo' })
+        ),
+        createElement(
+          'div',
+          { className: 'center-text login-input-div' },
+          createElement(
+            'div',
+            { className: 'left-inner-image' },
+            createElement('input', {
+              className: 'login-input',
+              placeholder: 'username',
+              value: this.state.loginName
+            }),
+            createElement('img', { role: 'img', src: paths.assets + 'user.svg' })
+          )
+        ),
+        createElement(
+          'div',
+          { className: 'center-text login-input-div' },
+          createElement(
+            'div',
+            { className: 'left-inner-image' },
+            createElement('input', {
+              className: 'login-input',
+              placeholder: 'password',
+              value: this.state.loginPassword
+            }),
+            createElement('img', { role: 'img', src: paths.assets + 'password.svg' })
+          )
+        )
+      ),
+      createElement('div', { className: 'login-backdrop backdrop' })
     );
   }
 }
+
+/**
+* generic footer, change internal on different page
+*/
+class SignInButton extends tenjs.Component {
+  /**
+  * @param {object} props
+  */
+  constructor(props) {
+    super(props);
+  }
+  /**
+  * @return {jsx}
+  */
+  render() {
+    return createElement(
+      'div',
+      { className: 'fill-parent' },
+      this.props.state.nowShowing === 'home' ? createElement(
+        'div',
+        { className: 'login-button-text center-text fill-parent' },
+        'SIGN IN'
+      ) : null
+    );
+  }
+}
+
+/**
+* generic footer, change internal on different page
+*/
+class Footer extends tenjs.Component {
+  /**
+  * @param {object} props
+  */
+  constructor(props) {
+    super(props);
+    // this.state = this.props.state;
+  }
+  /**
+  * @return {jsx}
+  */
+  render() {
+    return createElement(
+      'div',
+      null,
+      this.props.state.nowShowing === 'home' ? createElement(
+        'div',
+        { className: 'footer' },
+        createElement(SignInButton, { state: this.props.state })
+      ) : null
+    );
+  }
+}
+
+/**
+* @param {event} e
+*/
+class App extends tenjs.Component {
+  /**
+  * @param {object} props
+  */
+  constructor(props) {
+    super(props);
+
+    this.handleClick = e => {
+      alert('test');
+    };
+
+    this.state = {
+      nowShowing: 'home'
+    };
+  }
+
+  /**
+  * @return {object}
+  */
+  render() {
+    /*
+    <div onClick = {this.handleClick}>
+      hello {this.props.name}
+    </div>
+    */
+    return createElement(
+      'div',
+      { className: 'backdrop background-alt' },
+      createElement(Login, { state: this.state }),
+      createElement(Footer, { state: this.state })
+    );
+  }
+}
+
+// tenjs.render(<App name='test'/>, document.getElementById('root'));
+
+// import 'todomvc-common';
+// import 'todomvc-common/base.css';
+// import 'todomvc-app-css/index.css';
 
 tenjs.render(createElement(App, { name: 'test' }), document.getElementById('root'));
 
