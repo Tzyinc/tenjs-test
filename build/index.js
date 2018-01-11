@@ -50,9 +50,9 @@ function reconcile(parentDom, instance, element) {
     parentDom.appendChild(newInstance.dom);
     return newInstance;
   } else if (element == null) {
-    parantDom.removeChild(instance.dom);
+    parentDom.removeChild(instance.dom);
     return null;
-  } else if (instance.element.type === element.type) {
+  } else if (instance.element.type !== element.type) {
     updateDomProperties(instance.dom, instance.element.props, element.props);
     instance.childInstances = reconcileChildren(instance, element);
     instance.element = element;
@@ -70,7 +70,7 @@ function reconcile(parentDom, instance, element) {
     const childInstance = reconcile(parentDom, oldChildInstance, childElement);
     instance.dom = childInstance.dom;
     instance.childInstance = childInstance;
-    instane.element = element;
+    instance.element = element;
     return instance;
   }
 }
@@ -82,8 +82,8 @@ function reconcile(parentDom, instance, element) {
 */
 function reconcileChildren(instance, element) {
   const dom = instance.dom;
-  const childInstances = instance.childInstances;
-  const nextChildElements = elements.props.children || [];
+  const childInstances = instance.childInstances || [];
+  const nextChildElements = element.props.children || [];
   const newChildInstances = [];
   const count = Math.max(childInstances.length, nextChildElements.length);
   for (let i = 0; i < count; i++) {
@@ -109,7 +109,7 @@ function instantiate(element) {
     updateDomProperties(dom, [], props);
 
     // instantiate and append children
-    const childElements = props.children || [];
+    const childElements = props.children;
     const childInstances = childElements.map(instantiate);
     const childDoms = childInstances.map(childInstance => childInstance.dom);
     childDoms.forEach(childDom => dom.appendChild(childDom));
@@ -176,7 +176,7 @@ class Component {
   * @param {object} partialState
   */
   setState(partialState) {
-    this.state = object.assign({}, this.state, partialState);
+    this.state = Object.assign({}, this.state, partialState);
     updateInstance(this._internalInstance);
   }
 }
@@ -209,7 +209,7 @@ var tenjs = {
 };
 
 const paths = {
-  assets: 'http://localhost:8080/assets/'
+  assets: 'assets/'
 };
 
 /**
@@ -221,12 +221,25 @@ class Login extends tenjs.Component {
   */
   constructor(props) {
     super(props);
-    this.state = {
-      nowShowing: 'home',
-      loginName: '',
-      loginPassword: ''
+
+    this.inputChange = e => {
+      let inputState = {};
+      inputState[e.target.name] = e.target.value;
+
+      this.setState(inputState);
+      this.props.updateParent(this.state);
     };
+
+    this.state = this.props.state;
+
+    // this.setState(inputState);
   }
+
+  /**
+  * @param {object} e
+  */
+
+
   /**
   * @return {jsx}
   */
@@ -234,56 +247,63 @@ class Login extends tenjs.Component {
     return createElement(
       'div',
       null,
-      createElement(
+      this.state.nowShowing === 'home' ? createElement(
         'div',
-        { className: 'height-90 opacity-full' },
+        null,
         createElement(
           'div',
-          { className: 'center-text login-subtext' },
-          'FIND THE MOST LOVED ACTIVITIES'
-        ),
-        createElement(
-          'div',
-          { className: 'center-text login-maintext' },
-          'BLACK CAT'
-        ),
-        createElement(
-          'div',
-          { className: 'center-block login-logo-circle' },
-          createElement('object', { type: 'image/svg+xml',
-            data: paths.assets + 'logo-cat.svg',
-            className: 'center-block login-logo' })
-        ),
-        createElement(
-          'div',
-          { className: 'center-text login-input-div' },
+          { className: 'height-90 opacity-full' },
           createElement(
             'div',
-            { className: 'left-inner-image' },
-            createElement('input', {
-              className: 'login-input',
-              placeholder: 'username',
-              value: this.state.loginName
-            }),
-            createElement('img', { role: 'img', src: paths.assets + 'user.svg' })
-          )
-        ),
-        createElement(
-          'div',
-          { className: 'center-text login-input-div' },
+            { className: 'center-text login-subtext' },
+            'FIND THE MOST LOVED ACTIVITIES'
+          ),
           createElement(
             'div',
-            { className: 'left-inner-image' },
-            createElement('input', {
-              className: 'login-input',
-              placeholder: 'password',
-              value: this.state.loginPassword
-            }),
-            createElement('img', { role: 'img', src: paths.assets + 'password.svg' })
+            { className: 'center-text login-maintext' },
+            'BLACK CAT'
+          ),
+          createElement(
+            'div',
+            { className: 'center-block login-logo-circle' },
+            createElement('object', { type: 'image/svg+xml',
+              data: this.state.homeAddress + paths.assets + 'logo-cat.svg',
+              className: 'center-block login-logo' })
+          ),
+          createElement(
+            'div',
+            { className: 'center-text login-input-div' },
+            createElement(
+              'div',
+              { className: 'left-inner-image' },
+              createElement('input', {
+                name: 'username',
+                className: 'login-input',
+                placeholder: 'username',
+                onchange: this.inputChange
+              }),
+              createElement('img', { role: 'img', src: this.state.homeAddress + paths.assets + 'user.svg' })
+            )
+          ),
+          createElement(
+            'div',
+            { className: 'center-text login-input-div' },
+            createElement(
+              'div',
+              { className: 'left-inner-image' },
+              createElement('input', {
+                name: 'password',
+                type: 'password',
+                className: 'login-input',
+                placeholder: 'password',
+                onchange: this.inputChange
+              }),
+              createElement('img', { role: 'img', src: this.state.homeAddress + paths.assets + 'password.svg' })
+            )
           )
-        )
-      ),
-      createElement('div', { className: 'login-backdrop backdrop' })
+        ),
+        createElement('div', { className: 'login-backdrop backdrop' })
+      ) : null
     );
   }
 }
@@ -297,7 +317,26 @@ class SignInButton extends tenjs.Component {
   */
   constructor(props) {
     super(props);
+
+    this.handleClick = e => {
+      if (this.state.nowShowing === 'home') {
+        this.setState({ nowShowing: 'checkUser' });
+      } else {
+        this.setState({ nowShowing: 'home' });
+      }
+      // alert(updateParent);
+      this.props.updateParent(this.state);
+      // alert(JSON.stringify(this.state));
+    };
+
+    this.state = this.props.state;
   }
+
+  /**
+  * @param {object} e
+  */
+
+
   /**
   * @return {jsx}
   */
@@ -305,9 +344,10 @@ class SignInButton extends tenjs.Component {
     return createElement(
       'div',
       { className: 'fill-parent' },
-      this.props.state.nowShowing === 'home' ? createElement(
+      this.state.nowShowing === 'home' ? createElement(
         'div',
-        { className: 'login-button-text center-text fill-parent' },
+        { onClick: this.handleClick,
+          className: 'login-button-text center-text fill-parent' },
         'SIGN IN'
       ) : null
     );
@@ -323,7 +363,16 @@ class Footer extends tenjs.Component {
   */
   constructor(props) {
     super(props);
-    // this.state = this.props.state;
+    this.state = this.props.state;
+    this.handleChildState = this.handleChildState.bind(this);
+  }
+
+  /**
+  * @param {object} state
+  */
+  handleChildState(state) {
+    this.setState(state);
+    this.props.updateParent(this.state);
   }
   /**
   * @return {jsx}
@@ -332,17 +381,18 @@ class Footer extends tenjs.Component {
     return createElement(
       'div',
       null,
-      this.props.state.nowShowing === 'home' ? createElement(
+      this.state.nowShowing === 'home' ? createElement(
         'div',
         { className: 'footer' },
-        createElement(SignInButton, { state: this.props.state })
+        createElement(SignInButton, { updateParent: this.handleChildState,
+          state: this.state })
       ) : null
     );
   }
 }
 
 /**
-* @param {event} e
+*
 */
 class App extends tenjs.Component {
   /**
@@ -350,16 +400,53 @@ class App extends tenjs.Component {
   */
   constructor(props) {
     super(props);
-
-    this.handleClick = e => {
-      alert('test');
-    };
-
     this.state = {
-      nowShowing: 'home'
+      nowShowing: 'home',
+      homeAddress: document.location.href,
+      loggedIn: false
     };
+    this.handleChildState = this.handleChildState.bind(this);
   }
 
+  /**
+  * @param {object} state
+  */
+  handleChildState(state) {
+    this.setState(state);
+    alert(JSON.stringify(state));
+    this.checkLoginStatus();
+    alert(JSON.stringify(state));
+    if (!this.state.loggedIn) {
+      this.setState({ nowShowing: 'home' });
+      alert(JSON.stringify(state));
+    }
+  }
+
+  /**
+  */
+  checkLoginStatus() {
+    if (this.state.nowShowing != 'home') {
+      if (this.state.username) {
+        if (this.state.password) {
+          this.checkCredentials();
+        }
+      }
+    }
+  }
+
+  /**
+  */
+  checkCredentials() {
+    const users = localStorage.getItem('users');
+    for (index in users) {
+      if (users[index]) {
+        let user = users[index];
+        if (user.name === this.state.username && user.password === this.state.password) {
+          this.setState({ loggedIn: 'true' });
+        }
+      }
+    }
+  }
   /**
   * @return {object}
   */
@@ -371,9 +458,13 @@ class App extends tenjs.Component {
     */
     return createElement(
       'div',
-      { className: 'backdrop background-alt' },
-      createElement(Login, { state: this.state }),
-      createElement(Footer, { state: this.state })
+      null,
+      this.state.nowShowing === 'home' ? createElement(
+        'div',
+        { className: 'backdrop background-alt' },
+        createElement(Login, { updateParent: this.handleChildState, state: this.state }),
+        createElement(Footer, { updateParent: this.handleChildState, state: this.state })
+      ) : null
     );
   }
 }
@@ -383,7 +474,12 @@ class App extends tenjs.Component {
 // import 'todomvc-common';
 // import 'todomvc-common/base.css';
 // import 'todomvc-app-css/index.css';
+let defaultUser = [{
+  name: 'asdf',
+  password: 'asdf'
+}];
 
+localStorage.setItem('users', defaultUser);
 tenjs.render(createElement(App, { name: 'test' }), document.getElementById('root'));
 
 }());

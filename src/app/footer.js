@@ -9,7 +9,16 @@ export default class Footer extends tenjs.Component {
   */
   constructor(props) {
     super(props);
-    // this.state = this.props.state;
+    this.state = this.props.state;
+    this.handleChildState = this.handleChildState.bind(this);
+  }
+
+  /**
+  * @param {object} state
+  */
+  handleChildState(state) {
+    this.setState(state);
+    this.props.updateParent(this.state);
   }
   /**
   * @return {jsx}
@@ -18,9 +27,10 @@ export default class Footer extends tenjs.Component {
     return (
       <div>
       {
-        this.props.state.nowShowing === 'home' ? (
+        this.state.nowShowing === 'home' ? (
           <div className='footer'>
-            <SignInButton state={this.props.state} />
+            <SignInButton updateParent={this.handleChildState}
+            state={this.state} />
           </div>
         )
         : null
